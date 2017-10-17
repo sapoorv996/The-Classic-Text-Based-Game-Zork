@@ -10,5 +10,18 @@
 #define Object_hpp
 
 #include <stdio.h>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Object {
+private:
+    string status;
+    vector<Trigger*> triggers;
+public:
+    Object();
+    virtual ~Object();
+};
 
 #endif /* Object_hpp */
