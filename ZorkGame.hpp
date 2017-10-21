@@ -23,11 +23,24 @@ public:
 	ZorkGame(char*);
 	~ZorkGame();
 
-	std::vector<xml_node<>*> roomx;
-    std::vector<xml_node<>*> containerx;
-    std::vector<xml_node<>*> itemx;
-    std::vector<xml_node<>*> creaturex;
+	//Functions to setup the game
+
+	//
+	void startGame();
+	void showRoomDescription();
+	void checkUserInput();
+	void change_room(string);
 	
+	//Arrays that contain Room, Container, Item and Creature Nodes
+	vector<Room *> roomNodes;
+	// vector<Container *> containerNodes;
+	// vector<Item *> itemNodes;
+	// vector<Creature *> creatureNodes;
+
+	bool isGameOver;
+	string userIn; //User input from stdin
+	Room * curr_room; //The room I am currently in
+
 };
 
 #endif /* ZORKGAME_H_ */

@@ -10,8 +10,10 @@ int main(int argc, char *argv[])
 		std::cout << "Error! Please enter ./Zork [XMLFile]" << std::endl;
 	}
 
-	ZorkGame * zork = new ZorkGame(argv[1]);
+	ZorkGame * zork = new ZorkGame(argv[1]); //Parse the xml file
+	zork -> startGame(); //Start the zork game
 
+	delete zork;
 
 	return 0;
 }
