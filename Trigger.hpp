@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <string>
 #include "rapidxml.hpp"
 
 using namespace std;
@@ -41,7 +42,7 @@ public:
 			if (string(curr->name()) == "type"){
 				type = curr->value();
 			}else if (string(curr->name()) == "print"){
-				bool has_print = true;
+				has_print = true;
 				print = curr->value();
 			}else if (string(curr->name()) == "command"){
 				has_command = true;
