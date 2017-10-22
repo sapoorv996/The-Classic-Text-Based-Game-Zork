@@ -10,9 +10,13 @@
 #include <sstream>
 #include <vector>
 #include <queue>  
-#include "Room.hpp"
 #include <sstream>
 #include <iterator>
+
+#include "Room.hpp"
+#include "Creature.hpp"
+#include "Container.hpp"
+#include "Item.hpp"
 
 using namespace rapidxml;
 using namespace std;
@@ -33,9 +37,9 @@ public:
 	
 	//Arrays that contain Room, Container, Item and Creature Nodes
 	vector<Room *> roomNodes;
-	// vector<Container *> containerNodes;
-	// vector<Item *> itemNodes;
-	// vector<Creature *> creatureNodes;
+	vector<Container *> containerNodes;
+	vector<Item *> itemNodes;
+	vector<Creature *> creatureNodes;
 
 	bool isGameOver;
 	string userIn; //User input from stdin

@@ -48,29 +48,28 @@ ZorkGame::ZorkGame(char* fileName) {
 		Room * room = new Room(roomx[i]);
 		roomNodes.push_back(room);
 	}
-
 	curr_room = roomNodes.front();
 
 	//Populate Container
-	// std::cout << "\nPopulate Container Node" << std::endl;
-	// for (int i = 0; i < containerx.size(); i++){
-	// 	Container * container = new Container(containerx[i]);
-	// 	containerNodes.push_back(container);
-	// }
+	std::cout << "\nPopulate Container Node" << std::endl;
+	for (int i = 0; i < containerx.size(); i++){
+		Container * container = new Container(containerx[i]);
+		containerNodes.push_back(container);
+	}
 
 	//Populate Item 
-	// std::cout << "\nPopulate Item Node" << std::endl;
-	// for (int i = 0; i < itemx.size(); i++){
-	// 	Item * item = new Container(itemx[i]);
-	// 	itemNodes.push_back(item);
-	// }
+	std::cout << "\nPopulate Item Node" << std::endl;
+	for (int i = 0; i < itemx.size(); i++){
+		Item * item = new Item(itemx[i]);
+		itemNodes.push_back(item);
+	}
 
-	//Populate Creature
-	// std::cout << "\nPopulate Creature Node" << std::endl;
-	// for (int i = 0; i < creaturex.size(); i++){
-	// 	Creature * room = new Creature(creaturex[i]);
-	// 	creatureNodes.push_back(room);
-	// }
+	// Populate Creature
+	std::cout << "\nPopulate Creature Node" << std::endl;
+	for (int i = 0; i < creaturex.size(); i++){
+		Creature * creature = new Creature(creaturex[i]);
+		creatureNodes.push_back(creature);
+	}
 }
 
 void ZorkGame::startGame()
