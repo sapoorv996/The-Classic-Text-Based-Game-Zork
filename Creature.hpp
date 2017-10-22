@@ -3,15 +3,13 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include "rapidxml_print.hpp"
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <cstdlib>
-#include <list>
+#include "Trigger.hpp"
 
 using namespace rapidxml;
 using namespace std;
@@ -24,7 +22,7 @@ public:
 	string description;
 	vector<string> vulnerability;
 	// CreatureAttack *attack;
-	// vector<Trigger *> trigger_list;
+	vector<Trigger *> trigger_list;
 
 	Creature(xml_node<> * xnode) {setupNode(xnode);}
 	~Creature();
@@ -40,6 +38,11 @@ public:
 				description = curr->value();
 			}else if (string(curr->name()) == "vulnerability"){
 				vulnerability.push_back(curr->value());
+			}else if (string(curr->name()) == "trigger"){
+				Trigger * trigger = new Trigger(curr);
+				trigger_list.push_back(trigger);
+			}else if (string(curr->name()) == "attack"){
+				//NEED TO ADD ATTACK LOGIC
 			}
 		}
 	}	

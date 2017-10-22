@@ -12,7 +12,9 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+
 #include "rapidxml.hpp"
+#include "Trigger.hpp"
 
 using namespace std;
 using namespace rapidxml;
@@ -27,7 +29,8 @@ private:
     string description;
     string writing;
     vector<string> turnon;
-    
+    vector<Trigger *> trigger_list;
+
     void setUpItem(xml_node<>* xnode) {
     	for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
 			if(string(curr->name()) == "name"){
@@ -40,10 +43,10 @@ private:
 			}else if (string(curr->name()) == "writing"){
 				writing = curr->value();
 			}else if (string(curr->name()) == "turnon"){
-				//append to turn on list??
+				//NEED TO ADD TURN ON LOGIC!!
 			}else if (string(curr->name()) == "trigger"){
-				//Create new trigger object
-				//append object to tigger list
+				Trigger * trigger = new Trigger(curr);
+				trigger_list.push_back(trigger);
 			}
 		}
     }

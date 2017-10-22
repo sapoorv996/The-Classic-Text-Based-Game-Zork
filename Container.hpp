@@ -9,6 +9,9 @@
 #include "rapidxml_utils.hpp"
 #include "rapidxml_print.hpp"
 
+#include "Trigger.hpp"
+#include "Item.hpp"
+
 using namespace rapidxml;
 using namespace std;
 
@@ -18,10 +21,9 @@ public:
 	string name;
 	string status;
 	string description;
-	vector<string> vulnerability;
 	vector<string> valid_list;
 	vector<string> item_list;
-	// vector<Trigger *> trigger_list;
+	vector<Trigger *> trigger_list;
 
 	Container(xml_node<> * xnode) {setupNode(xnode);}
 	~Container();
@@ -39,6 +41,9 @@ public:
 				valid_list.push_back(curr->value());
 			}else if(string(curr->name()) == "item"){
 				item_list.push_back(curr->value());
+			}else if(string(curr->name()) == "trigger"){
+				Trigger * trigger = new Trigger(curr);
+				trigger_list.push_back(trigger);
 			}
 		}
 	}

@@ -3,18 +3,24 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+
 #include "rapidxml.hpp"
 #include "rapidxml_utils.hpp"
 #include "rapidxml_print.hpp"
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <cstdlib>
-#include <list>
+#include "Creature.hpp"
+#include "Container.hpp"
+#include "Item.hpp"
+#include "Room.hpp"
 
 using namespace rapidxml;
 using namespace std;
+
+typedef struct {
+  string direction;
+  string name;
+}Border;
 
 class Room
 {
@@ -23,17 +29,17 @@ public:
 	std::string status; 
 	std::string type; 
 	std::string description; 
-	// vector<Border *> border_arr; 
-	// vector<std::string *> container_arr; 
-	// vector<std::string *> item_arr;
-	// vector<std::sting *> creature_arr; 
-	// vector<Trigger *> trigger_arr;
+	vector<Border *> border_arr;
+	vector<string> container_arr; 
+	vector<string> item_arr;
+	vector<string> creature_arr; 
+	vector<Trigger *> trigger_arr;
 
 	Room(xml_node<> * xnode) {setupNode(xnode);}
 	~Room();
 
 	void setupNode(xml_node<> * xnode) {
-		for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
+		for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
 			if (string(curr->name()) == "name") {
 				name = curr->value();
 				cout << "Room - name: " << name << endl;
@@ -43,8 +49,65 @@ public:
 				type = curr->value();
 			}else if (string(curr->name()) == "description"){
 				description = curr->value();
+			}else if (string(curr->name()) == "container"){
+				container_arr.push_back(curr->value());
+			}else if (string(curr->name()) == "item"){
+				item_arr.push_back(curr->value());
+			}else if (string(curr->name()) == "creature"){
+				creature_arr.push_back(curr->value());
+			}else if (string(curr->name()) == "trigger"){
+				Trigger * trigger = new Trigger(curr);
+				trigger_arr.push_back(trigger);
+			}else if (string(curr->name()) == "border"){
+				Border * newborder = new Border();
+				string bdname, direction;
+
+				for(xml_node<> * b = xnode->first_node(); b; b = b->next_sibling()) {
+					if (string(b->name()) == "name") {
+						bdname = b -> value();
+					}else if (string(b->name()) == "direction") {
+						direction = b -> value();
+						if(direction == "north")	{direction = "n";}
+						if(direction == "south")	{direction = "s";}
+						if(direction == "west")		{direction = "w";}
+						if(direction == "east")		{direction = "e";}
+					}
+				}
+
+				newborder -> direction = direction;
+				newborder -> name = bdname;
+				border_arr.push_back(newborder);
 			}
 		}
+	}
+
+	bool has_item(string obj) {
+		for (int i = 0; i < item_arr.size(); i++){
+			if (item_arr[i] == obj){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	bool has_creature(string obj) {
+		for (int i = 0; i < creature_arr.size(); i++){
+			if (creature_arr[i] == obj){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	bool has_container(string obj) {
+		for (int i = 0; i < container_arr.size(); i++){
+			if (container_arr[i] == obj){
+				return true;
+			}
+		}
+		
+		return false;
 	}
 };
 #endif /* ROOM_H_ */
