@@ -5,12 +5,7 @@
 #include <string>
 #include <stdio.h>
 #include "rapidxml.hpp"
-#include <fstream>
-#include <istream>
-#include <sstream>
 #include <vector>
-#include <queue>  
-#include <sstream>
 #include <iterator>
 
 #include "Room.hpp"

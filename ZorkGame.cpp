@@ -99,7 +99,26 @@ void ZorkGame::checkUserInput()
 void ZorkGame::change_room(string d)
 {
 	Room * nextRoom = curr_room;
-	//NEED BORDER CLASS!
+
+	for (int i = 0; i < curr_room->border_arr.size(); i++){
+		if (curr_room->border_arr[i]->direction == d){
+			for (int j = 0; j < roomNodes.size(); j++){
+				if (roomNodes[j]->name == curr_room->border_arr[i]->name){
+					nextRoom = roomNodes[j];
+					break;
+				}
+			}
+			break;
+		}
+	}
+	if (nextRoom == curr_room){
+		cout << "can't go that way!" << endl;
+	}else{
+		curr_room = nextRoom;
+		cout << "move to room " + curr_room->name << endl;
+	}
+
+	showRoomDescription();
 }
 
 
@@ -108,12 +127,44 @@ void ZorkGame::showRoomDescription()
 	cout << curr_room -> description << endl;
 
 	//Display items
+	if (curr_room->item_arr.size() != 0){
+		cout << "Items in this room: ";
+		for (int i = 0; i < curr_room->item_arr.size()-1; i++){
+			cout << curr_room->item_arr[i] << ", ";
+		}
+		cout << curr_room->item_arr.back();
+		cout << endl;
+	}
 
-	//Display containers 
+	//Display containers
+	if (curr_room->container_arr.size() != 0){
+		cout << "Containers in this room: ";
+		for (int i = 0; i < curr_room->container_arr.size()-1; i++){
+			cout << curr_room->container_arr[i] << ", ";
+		}
+		cout << curr_room->container_arr.back();
+		cout << endl;
+	} 
 
 	//Display creatures 
+	if (curr_room->creature_arr.size() != 0){
+		cout << "Creatures in this room: ";
+		for (int i = 0; i < curr_room->creature_arr.size()-1; i++){
+			cout << curr_room->creature_arr[i] << ", ";
+		}
+		cout << curr_room->creature_arr.back();
+		cout << endl;
+	}
 
 	//Display borders
+	if (curr_room->border_arr.size() != 0){
+		cout << "You may go ";
+		for (int i = 0; i < curr_room->border_arr.size()-1; i++){
+			cout << curr_room->border_arr[i] -> direction << ", ";
+		}
+		cout << curr_room->border_arr.back()->direction;
+		cout << endl;
+	}
 }
 
 ZorkGame::~ZorkGame() {

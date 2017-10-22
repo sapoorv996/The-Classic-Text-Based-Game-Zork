@@ -105,7 +105,6 @@ private:
 
     Status s;
     Owner o;
-
 };
 
 #endif /* Trigger_hpp */

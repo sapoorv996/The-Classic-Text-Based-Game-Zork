@@ -25,10 +25,10 @@ typedef struct {
 class Room
 {
 public:
-	std::string name;
-	std::string status; 
-	std::string type; 
-	std::string description; 
+	string name;
+	string status; 
+	string type; 
+	string description; 
 	vector<Border *> border_arr;
 	vector<string> container_arr; 
 	vector<string> item_arr;
@@ -61,19 +61,23 @@ public:
 			}else if (string(curr->name()) == "border"){
 				Border * newborder = new Border();
 				string bdname, direction;
+				// cout << "Border Construction - ";
 
-				for(xml_node<> * b = xnode->first_node(); b; b = b->next_sibling()) {
+				for(xml_node<> * b = curr->first_node(); b; b = b->next_sibling()) {
 					if (string(b->name()) == "name") {
 						bdname = b -> value();
+						// cout << bdname << " - ";
 					}else if (string(b->name()) == "direction") {
 						direction = b -> value();
+						// cout << direction << " " << endl;
+
 						if(direction == "north")	{direction = "n";}
 						if(direction == "south")	{direction = "s";}
 						if(direction == "west")		{direction = "w";}
 						if(direction == "east")		{direction = "e";}
 					}
 				}
-
+				
 				newborder -> direction = direction;
 				newborder -> name = bdname;
 				border_arr.push_back(newborder);
@@ -100,6 +104,7 @@ public:
 		
 		return false;
 	}
+
 	bool has_container(string obj) {
 		for (int i = 0; i < container_arr.size(); i++){
 			if (container_arr[i] == obj){
@@ -110,4 +115,5 @@ public:
 		return false;
 	}
 };
+
 #endif /* ROOM_H_ */
