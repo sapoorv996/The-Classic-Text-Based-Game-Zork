@@ -20,13 +20,13 @@ using namespace rapidxml;
 typedef struct {
     string object;
     string status;
-}Status;
+} Status;
 
 typedef struct {
     string object;
     string has;
     string owner;
-}Owner;
+} Owner;
 
 class Trigger {
 public:
