@@ -26,7 +26,7 @@ public:
 	vector<Trigger *> trigger_list;
 
 	Creature(xml_node<> * xnode) {setupNode(xnode);}
-	~Creature();
+    ~Creature();
 
 	void setupNode(xml_node<> * xnode) {
 		for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
