@@ -25,7 +25,7 @@ public:
     string object;
     bool has;
     string owner;
-} Owner;
+};
 
 
 #endif /* Owner_hpp */

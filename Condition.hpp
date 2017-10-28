@@ -21,6 +21,9 @@ using namespace rapidxml;
 
 class Condition {
 public:
+    Status status;
+    Owner owner;
+    
     Condition(xml_node<>* xnode) {
         int numConditions = condition_count(xnode);
         if (numConditions == 2) {
@@ -30,9 +33,6 @@ public:
         }
     }
     ~Condition();
-    
-    Status status;
-    Owner owner;
     
     void setupStatus(xml_node<>* xnode) {
         for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
