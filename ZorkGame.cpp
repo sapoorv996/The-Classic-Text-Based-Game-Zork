@@ -153,11 +153,6 @@ void ZorkGame::put(string putItem, string inContainer){
 								cout << putItem << " cannot be put into " << inContainer << endl;
 								return;
 							}
-							/*
-							else if (vec_container[k]->status == "locked"){
-								cout << "Please open " << inContainer << " first" << endl;
-								return;
-							}*/
 							containerNodes[k]->item_list.push_back(putItem);
 							remove_from_vec(inventory, putItem);
 							cout << putItem << " has been put in " << inContainer << endl;
