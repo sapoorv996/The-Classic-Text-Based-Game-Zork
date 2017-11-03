@@ -24,17 +24,29 @@ public:
 
 	//Functions to setup the game
 
-	//
+	//Helper functions
 	void startGame();
 	void showRoomDescription();
 	void checkUserInput();
 	void change_room(string);
+	void show_inventory();
+	void take(string);
+	void remove_from_vec(vector<string> &vec, int index);
+	void remove_from_vec(vector<string> &vec, string str);
+	void open(string);
+	void gameOver();
+	void read(string);
+	void drop(string);
+	void put(string, string);
 	
 	//Arrays that contain Room, Container, Item and Creature Nodes
 	vector<Room *> roomNodes;
 	vector<Container *> containerNodes;
 	vector<Item *> itemNodes;
 	vector<Creature *> creatureNodes;
+
+	//Inventory list
+	vector<string> inventory;
 
 	bool isGameOver;
 	string userIn; //User input from stdin

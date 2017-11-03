@@ -23,11 +23,12 @@ class Item {
 public:
     Item(xml_node<>* xnode) {setUpItem(xnode);};
     ~Item();
-private:
     string name;
+    string writing;
+private:
     string status;
     string description;
-    string writing;
+    
     vector<string> turnon;
     vector<Trigger *> trigger_list;
 
