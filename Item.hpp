@@ -32,8 +32,8 @@ public:
     string name;
     string writing;
     TurnOn turnon;
-private:
     string status;
+private:
     string description;
     vector<Trigger *> trigger_list;
 

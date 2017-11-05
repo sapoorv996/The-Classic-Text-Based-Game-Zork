@@ -425,14 +425,67 @@ void ZorkGame::performAction(string action) {
 }
 
 void ZorkGame::attack(string creature, string item) {
-    
+    int i;
+    //1. Check if the creature is in the room
+    for (i = 0; i < curr_room->creature_arr.size(); i++) {
+        if (curr_room->creature_arr[i] == creature) {break;}
+    }
+    if (curr_room->creature_arr[i] != creature) {
+        std:cout << "That creature isn't in the room." << std::endl;
+        return;
+    }
+    //2. Check if the item is in your inventory
+    for (i = 0; i < inventory.size(); i++) {
+        if (inventory[i] == item) {break;}
+    }
+    if (inventory[i] != item) {
+        std::cout << item << "That item is not in your inventory." << std::endl;
+        return;
+    }
+    //3. Start the attack
+    std::cout << "You assault the " << creature << " with the " << item << "." << std::endl;
+    //4. Check if creature is vulnerable to item
+    int whichCreature = whichOne(creature, creatureNodes);
+    for (i = 0; i < creatureNodes[whichCreature]->vulnerability.size(); i++) { //for each vulnerability
+        if (creatureNodes[whichCreature]->vulnerability[i] == item) {break;}
+    }
+    if (creatureNodes[whichCreature]->vulnerability[i] != item) {
+        std::cout << "It's not very effective." << std::endl;
+        return;
+    }
+    //5. Check if there is an effect of the attack
+    if (creatureNodes[whichCreature]->attack == NULL) {return;}
+    //6. Check conditions
+    if (creatureNodes[whichCreature]->attack->condition != NULL) {
+        Status condStat = creatureNodes[whichCreature]->attack->condition->status;
+        Owner condOwner = creatureNodes[whichCreature]->attack->condition->owner;
+        if (condStat.status != "") { //Condition fields: object and status
+            int loc;
+            loc = whichOne(condStat.object, roomNodes); //check if type of status.object is room
+            if (loc != -1) {roomNodes[loc]->status = condStat.status;}
+            loc = whichOne(condStat.object, containerNodes); //check if type of status.object is container
+            if (loc != -1) {containerNodes[loc]->status = condStat.status;}
+            loc = whichOne(condStat.object, itemNodes); //check if type of status.object is item
+            if (loc != -1) {itemNodes[loc]->status = condStat.status;}
+            loc = whichOne(condStat.object, creatureNodes); //check if type of status.object is creature
+            if (loc != -1) {creatureNodes[loc]->status = condStat.status;}
+        }
+    }
+    //7. Print the attack
+    if (creatureNodes[whichCreature]->attack->has_print) {
+        std::cout << creatureNodes[whichCreature]->attack->print << std::endl;
+    }
+    //8. Perform the actions
+    for (i = 0; i < creatureNodes[whichCreature]->attack->action.size(); i++) { //for each action
+        performAction(creatureNodes[whichCreature]->attack->action[i]);
+    }
 }
 
 void ZorkGame::Add(string action) {
     //Usage: Add (object) to (room/container)
     int found = action.find("to ");
     //1. Get substrings
-    string room_container = action.substr(4, found - 5);
+    string room_container = action.substr(found + 3);
     string object = action.substr(4, found - 5);
     //2. Get the type of the object (can be Container, Item, or Creature in this case)
     string objectType = whatIs(object);
@@ -455,20 +508,29 @@ void ZorkGame::Add(string action) {
     }
 }
 
-void ZorkGame::Delete(string object) {
+void ZorkGame::Delete(string object) { //Delete references in each room should "delete" the item...
     //Usage: Delete (object)
+    object = object.substr(7);
     int i, j;
-    for (i = 0; i < roomNodes.size() ; i++) { //for each room
-        for (j = 0; j < roomNodes[i]->border_arr.size(); j++) { //for each border in the room
-            if (roomNodes[i]->border_arr[j]->name == object) { //if the border name matches
+    for (i = 0; i < roomNodes.size(); i++) { //for each room
+        for (j = 0; j < roomNodes[i]->border_arr.size(); j++) { //for each border
+            if (roomNodes[i]->border_arr[j]->name == object) {
                 roomNodes[i]->border_arr.erase(j);
             }
         }
-    }
-    for (i = 0; i < containerNodes.size() ; i++) { //for each container
-        for (j = 0; j < roomNodes[i]->border_arr.size(); j++) { //for each border in the room
-            if (roomNodes[i]->border_arr[j]->name == object) { //if the border name matches
-                roomNodes[i]->border_arr.erase(j);
+        for (j = 0; j < roomNodes[i]->container_arr.size(); j++) { //for each container
+            if (roomNodes[i]->container_arr[j] == object) {
+                roomNodes[i]->container_arr.erase(j);
+            }
+        }
+        for (j = 0; j < roomNodes[i]->item_arr.size(); j++) { //for each item
+            if (roomNodes[i]->item_arr[j] == object) {
+                roomNodes[i]->item_arr.erase(j);
+            }
+        }
+        for (j = 0; j < roomNodes[i]->creature_arr.size(); j++) { //for each creature
+            if (roomNodes[i]->creature_arr[j] == object) {
+                roomNodes[i]->creature_arr.erase(j);
             }
         }
     }
@@ -476,6 +538,34 @@ void ZorkGame::Delete(string object) {
 
 void ZorkGame::Update(string action) {
     //Usage: Update (object) to (status)
+    int found = action.find("to ");
+    string object = action.substr(7, found - 2);
+    string status = action.substr(found + 3);
+    int i;
+    for (i = 0; i < roomNodes.size(); i++) { //for each room
+        if (roomNodes[i]->name == object) {
+            roomNodes[i]->status = status;
+            return;
+        }
+    }
+    for (i = 0; i < containerNodes.size(); i++) { //for each container
+        if (containerNodes[i]->name == object) {
+            containerNodes[i]->status = status;
+            return;
+        }
+    }
+    for (i = 0; i < itemNodes.size(); i++) { //for each item
+        if (itemNodes[i]->name == object) {
+            itemNodes[i]->status = status;
+            return;
+        }
+    }
+    for (i = 0; i < itemNodes.size(); i++) { //for each creature
+        if (itemNodes[i]->name == object) {
+            itemNodes[i]->status = status;
+            return;
+        }
+    }
 }
 
 string ZorkGame::whatIs(string name) {
