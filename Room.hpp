@@ -20,7 +20,7 @@ using namespace std;
 typedef struct {
   string direction;
   string name;
-}Border;
+} Border;
 
 class Room
 {
@@ -114,6 +114,19 @@ public:
 		
 		return false;
 	}
+    /*Remove an element from border_arr.
+     Source: https://stackoverflow.com/questions/991335/how-to-erase-delete-pointers-to-objects-stored-in-a-vector*/
+    void removeBorder(string name) {
+        vector<Border*>::iterator b;
+        for (b = border_arr.begin(); b != border_arr.end();) {
+            if ((*b)->name == name) {
+                delete *b;
+                b = border_arr.erase(b);
+            } else {
+                b++;
+            }
+        }
+    }
 };
 
 #endif /* ROOM_H_ */

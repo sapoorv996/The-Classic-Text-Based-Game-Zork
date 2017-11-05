@@ -10,6 +10,7 @@
 #include "rapidxml_print.hpp"
 
 #include "Trigger.hpp"
+#include "Attack.hpp"
 
 using namespace rapidxml;
 using namespace std;
@@ -21,28 +22,28 @@ public:
 	string status;
 	string description;
 	vector<string> vulnerability;
-	// CreatureAttack *attack;
+	Attack* attack;
 	vector<Trigger *> trigger_list;
 
 	Creature(xml_node<> * xnode) {setupNode(xnode);}
-	~Creature();
+    ~Creature();
 
 	void setupNode(xml_node<> * xnode) {
 		for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
 			if (string(curr->name()) == "name") {
 				name = curr->value();
 				cout << "Creature - name: " << name << endl;
-			}else if (string(curr->name()) == "status"){
+			} else if (string(curr->name()) == "status") {
 				status = curr->value();
-			}else if (string(curr->name()) == "description"){
+			} else if (string(curr->name()) == "description") {
 				description = curr->value();
-			}else if (string(curr->name()) == "vulnerability"){
+			} else if (string(curr->name()) == "vulnerability") {
 				vulnerability.push_back(curr->value());
-			}else if (string(curr->name()) == "trigger"){
+			} else if (string(curr->name()) == "trigger") {
 				Trigger * trigger = new Trigger(curr);
 				trigger_list.push_back(trigger);
-			}else if (string(curr->name()) == "attack"){
-				//NEED TO ADD ATTACK LOGIC
+			} else if (string(curr->name()) == "attack") {
+                attack = new Attack(curr);
 			}
 		}
 	}	

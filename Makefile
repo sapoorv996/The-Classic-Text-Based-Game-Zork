@@ -1,3 +1,5 @@
+all: Zork
+
 Zork: main.o ZorkGame.o
 	g++ -o Zork main.o ZorkGame.o
 

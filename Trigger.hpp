@@ -12,21 +12,12 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+
 #include "rapidxml.hpp"
+#include "Condition.hpp"
 
 using namespace std;
 using namespace rapidxml;
-
-typedef struct {
-    string object;
-    string status;
-}Status;
-
-typedef struct {
-    string object;
-    string has;
-    string owner;
-}Owner;
 
 class Trigger {
 public:
@@ -39,63 +30,26 @@ public:
 		bool has_action = false;
 
     	for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
-			if (string(curr->name()) == "type"){
+			if (string(curr->name()) == "type") {
 				type = curr->value();
-			}else if (string(curr->name()) == "print"){
+			} else if (string(curr->name()) == "print") {
 				has_print = true;
 				print = curr->value();
-			}else if (string(curr->name()) == "command"){
+			} else if (string(curr->name()) == "command") {
 				has_command = true;
 				command = curr->value();
-			}else if (string(curr->name()) == "action"){
+			} else if (string(curr->name()) == "action") {
 				has_action = true;
 				action.push_back(string(curr->value()));
-			}else if (string(curr->name()) == "condition"){
-				int condition = condition_count(curr);
-				if(condition == 2) {
-					setupStatus(curr);
-				} else if(condition == 3) {
-					setupOwner(curr);
-				}
+			} else if (string(curr->name()) == "condition") {
+                Condition* c = new Condition(curr);
+                conditions.push_back(c);
 			}
 		}
     }
 
-    int condition_count(xml_node<>* xnode) {
-    	int num = 0;
-        for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
-            num++;
-        }
-        return num;
-    }
-
-    void setupStatus(xml_node<>* xnode) {
-        for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
-        	if(string(curr->name()) == "object"){
-                s.object = curr -> value();
-            }
-            if(string(curr->name()) == "status"){
-                s.status = curr -> value();
-            }
-        }	
-    }
-
-    void setupOwner(xml_node<>* xnode) {
-        for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
-        	if(string(curr->name()) == "object"){
-                o.object = curr -> value();
-            }
-            if(string(curr->name()) == "has"){
-                o.has = curr -> value();
-            }
-            if(string(curr->name()) == "owner"){
-                o.owner = curr -> value();
-            }
-        }	
-    }
-
 private:
-    // vector<Condition*> conditions;
+    vector<Condition*> conditions;
     string type;
     string command;
     bool has_command;
@@ -103,9 +57,6 @@ private:
     bool has_print;
     vector <string> action;
     bool has_action;
-
-    Status s;
-    Owner o;
 };
 
 #endif /* Trigger_hpp */
