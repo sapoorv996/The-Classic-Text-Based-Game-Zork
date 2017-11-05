@@ -509,29 +509,31 @@ void ZorkGame::Add(string action) {
 }
 
 void ZorkGame::Delete(string object) { //Delete references in each room should "delete" the item...
+    //Source: https://stackoverflow.com/questions/991335/how-to-erase-delete-pointers-to-objects-stored-in-a-vector
     //Usage: Delete (object)
     object = object.substr(7);
     int i, j;
     for (i = 0; i < roomNodes.size(); i++) { //for each room
         for (j = 0; j < roomNodes[i]->border_arr.size(); j++) { //for each border
             if (roomNodes[i]->border_arr[j]->name == object) {
-                roomNodes[i]->border_arr.erase(j);
+                roomNodes[i]->removeBorder(roomNodes[i]->border_arr[j]->name);
             }
         }
-        for (j = 0; j < roomNodes[i]->container_arr.size(); j++) { //for each container
-            if (roomNodes[i]->container_arr[j] == object) {
-                roomNodes[i]->container_arr.erase(j);
-            }
+        vector<string>::iterator s;
+        for(s = roomNodes[i]->container_arr.begin(); s != roomNodes[i]->container_arr.end();) { //for each container
+            if (*s == object) {
+                s = roomNodes[i]->container_arr.erase(s);
+            } else {s++;}
         }
-        for (j = 0; j < roomNodes[i]->item_arr.size(); j++) { //for each item
-            if (roomNodes[i]->item_arr[j] == object) {
-                roomNodes[i]->item_arr.erase(j);
-            }
+        for(s = roomNodes[i]->item_arr.begin(); s != roomNodes[i]->item_arr.end();) { //for each item
+            if (*s == object) {
+                s = roomNodes[i]->item_arr.erase(s);
+            } else {s++;}
         }
-        for (j = 0; j < roomNodes[i]->creature_arr.size(); j++) { //for each creature
-            if (roomNodes[i]->creature_arr[j] == object) {
-                roomNodes[i]->creature_arr.erase(j);
-            }
+        for(s = roomNodes[i]->creature_arr.begin(); s != roomNodes[i]->creature_arr.end();) { //for each creature
+            if (*s == object) {
+                s = roomNodes[i]->creature_arr.erase(s);
+            } else {s++;}
         }
     }
 }
