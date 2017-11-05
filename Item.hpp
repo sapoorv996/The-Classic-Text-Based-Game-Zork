@@ -19,39 +19,52 @@
 using namespace std;
 using namespace rapidxml;
 
+typedef struct TurnOn {
+    bool has;
+    string print;
+    string action;
+} TurnOn;
+
 class Item {
 public:
     Item(xml_node<>* xnode) {setUpItem(xnode);};
     ~Item();
     string name;
     string writing;
-private:
+    TurnOn turnon;
     string status;
+private:
     string description;
-    
-    vector<string> turnon;
     vector<Trigger *> trigger_list;
-
+    
     void setUpItem(xml_node<>* xnode) {
-    	for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
-			if(string(curr->name()) == "name"){
-				name = curr->value();
-				cout << "Item - name: " << name << endl;
-			}else if (string(curr->name()) == "status"){
-				status = curr->value();
-			}else if (string(curr->name()) == "description"){
-				description = curr->value();
-			}else if (string(curr->name()) == "writing"){
-				writing = curr->value();
-			}else if (string(curr->name()) == "turnon"){
-				//NEED TO ADD TURN ON LOGIC!!
-			}else if (string(curr->name()) == "trigger"){
-				Trigger * trigger = new Trigger(curr);
-				trigger_list.push_back(trigger);
-			}
-		}
+        turnon.has = false;
+        for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
+            if(string(curr->name()) == "name"){
+                name = curr->value();
+                cout << "Item - name: " << name << endl;
+            } else if (string(curr->name()) == "status") {
+                status = curr->value();
+            } else if (string(curr->name()) == "description") {
+                description = curr->value();
+            } else if (string(curr->name()) == "writing") {
+                writing = curr->value();
+            } else if (string(curr->name()) == "turnon") {
+                turnon.has = true;
+                for (xml_node<> * curr2 = curr->first_node(); curr2; curr2 = curr2->next_sibling()) {
+                    if (string(curr2->name()) == "print") {
+                        turnon.print = curr2->value();
+                    } else if (string(curr2->name()) == "action") {
+                        turnon.action = curr2->value();
+                    }
+                }
+            } else if (string(curr->name()) == "trigger") {
+                Trigger * trigger = new Trigger(curr);
+                trigger_list.push_back(trigger);
+            }
+        }
     }
-    void setUpTurnOn(xml_node<>*);
+    //void setUpTurnOn(xml_node<>*);
 };
 
 #endif /* Item_hpp */
