@@ -248,10 +248,15 @@ void ZorkGame::open(string ctnr)
                         return;
                     }
                     cout << ctnr << " contains ";
+                    //TODO: add container items to room
                     for (unsigned int k = 0; k < containerNodes[j]->item_list.size()-1; k++){
-                        cout << containerNodes[j]->item_list[k] << ", ";
+                        string itemToAdd = containerNodes[j]->item_list[k];
+                        cout << itemToAdd << ", ";
+                        curr_room->item_arr.push_back(itemToAdd);
                     }
                     cout << containerNodes[j]->item_list.back() << endl;
+                    curr_room->item_arr.push_back(containerNodes[j]->item_list.back());
+                    showRoomDescription();
                     return;
                 }
             }
