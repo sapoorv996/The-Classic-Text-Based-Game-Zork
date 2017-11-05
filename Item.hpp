@@ -20,7 +20,7 @@ using namespace std;
 using namespace rapidxml;
 
 typedef struct TurnOn {
-    bool has;
+    bool has = false;
     string print;
     string action;
 } TurnOn;
@@ -29,12 +29,12 @@ class Item {
 public:
     Item(xml_node<>* xnode) {setUpItem(xnode);};
     ~Item();
-private:
     string name;
-    string status;
-    string description;
     string writing;
     TurnOn turnon;
+private:
+    string status;
+    string description;
     vector<Trigger *> trigger_list;
 
     void setUpItem(xml_node<>* xnode) {

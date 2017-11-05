@@ -27,14 +27,14 @@ public:
     Condition(xml_node<>* xnode) {
         int numConditions = condition_count(xnode);
         if (numConditions == 2) {
-            setupStatus(xnode);
+            initStatus(xnode);
         } else if (numConditions == 3) {
-            setupOwner(xnode);
+            initOwner(xnode);
         }
     }
     ~Condition();
     
-    void setupStatus(xml_node<>* xnode) {
+    void initStatus(xml_node<>* xnode) {
         for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
             if(string(curr->name()) == "object"){
                 this->status.object = curr -> value();
@@ -45,7 +45,7 @@ public:
         }
     }
     
-    void setupOwner(xml_node<>* xnode) {
+    void initOwner(xml_node<>* xnode) {
         for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
             if(string(curr->name()) == "object"){
                 this->owner.object = curr -> value();
