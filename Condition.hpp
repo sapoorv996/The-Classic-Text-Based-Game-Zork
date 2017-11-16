@@ -23,9 +23,10 @@ class Condition {
 public:
     Status status;
     Owner owner;
+    int numConditions;
     
     Condition(xml_node<>* xnode) {
-        int numConditions = condition_count(xnode);
+        numConditions = condition_count(xnode);
         if (numConditions == 2) {
             initStatus(xnode);
         } else if (numConditions == 3) {

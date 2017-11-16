@@ -13,6 +13,9 @@
 #include "Creature.hpp"
 #include "Container.hpp"
 #include "Item.hpp"
+#include "Trigger.hpp"
+#include "Status.hpp"
+#include "Owner.hpp"
 
 using namespace rapidxml;
 using namespace std;
@@ -28,7 +31,8 @@ public:
 	//Helper functions
 	void startGame();
 	void showRoomDescription();
-	void checkUserInput();
+	void checkUserInput_util();
+	void checkUserInput(string);
 	void change_room(string);
 	void show_inventory();
 	void take(string);
@@ -53,6 +57,16 @@ public:
     /*whichOne: Determines where a Zork object is in its vector. Returns -1 on failure.
      Example: whichOne("key", itemNodes) will return the index in itemNodes where the "key" item is*/
     template <class T> int whichOne(string, vector<T*>);
+
+    //Trigger functions
+    bool trigger_check();
+    bool trigger_condition_met(Trigger* trigger);
+    void implement_trigger(Trigger* trigger);
+    bool trig_owner_met(Trigger* trigger, Owner * o);
+    bool trig_status_met(Trigger* trigger, Status * s);
+    bool owner_has_object(string owner, string obj);
+    bool object_meet_status(string obj, string status);
+    string ztype(string obj);
 	
 	//Arrays that contain Room, Container, Item and Creature Nodes
 	vector<Room *> roomNodes;
@@ -64,6 +78,7 @@ public:
 	vector<string> inventory;
 
 	bool isGameOver;
+	bool isOverriden;
 	string userIn; //User input from stdin
 	Room * curr_room; //The room I am currently in
 };

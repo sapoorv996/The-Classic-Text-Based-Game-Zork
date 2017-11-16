@@ -47,8 +47,7 @@ public:
 			}
 		}
     }
-
-private:
+    
     vector<Condition*> conditions;
     string type;
     string command;
@@ -57,6 +56,11 @@ private:
     bool has_print;
     vector <string> action;
     bool has_action;
+
+    // Status * my_s;
+    // Owner * my_o;
+
+
 };
 
 #endif /* Trigger_hpp */

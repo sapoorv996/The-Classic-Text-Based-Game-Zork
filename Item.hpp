@@ -33,9 +33,9 @@ public:
     string writing;
     TurnOn turnon;
     string status;
+    vector<Trigger *> trigger_list;
 private:
     string description;
-    vector<Trigger *> trigger_list;
     
     void setUpItem(xml_node<>* xnode) {
         turnon.has = false;
