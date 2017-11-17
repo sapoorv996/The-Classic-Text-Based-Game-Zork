@@ -2,33 +2,33 @@
 
 
 ZorkGame::ZorkGame(char* fileName) {
-    
+
     xml_document<> doc;
     xml_node<> * root_node;
-    
+
     // Read the xml file into a vector
     ifstream theFile(fileName);
     if (!theFile.is_open()) {
         cout << "Error opening file.... Exiting." << endl;
     }
-    
+
     //Arrays that contain xml nodes
     std::vector<xml_node<>*> roomx;
     std::vector<xml_node<>*> containerx;
     std::vector<xml_node<>*> itemx;
     std::vector<xml_node<>*> creaturex;
-    
+
     vector<char> buffer((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
     buffer.push_back('\0');
     // Parse the buffer using the xml file parsing library into doc
     doc.parse<0>(&buffer[0]);
-    
+
     // Find root node
     root_node = doc.first_node();
-    
+
     for(xml_node<>*top = root_node -> first_node(); top; top = top -> next_sibling()){
         // std::cout << top->name() << std::endl;
-        
+
         if(string(top->name()) == string("room")){
             roomx.push_back(top);
         }
@@ -42,28 +42,28 @@ ZorkGame::ZorkGame(char* fileName) {
             creaturex.push_back(top);
         }
     }
-    
+
     std::cout << "\nPopulate Room Node" << std::endl;
     for (int i = 0; i < roomx.size(); i++){
         Room * room = new Room(roomx[i]);
         roomNodes.push_back(room);
     }
     curr_room = roomNodes.front();
-    
+
     //Populate Container
     std::cout << "\nPopulate Container Node" << std::endl;
     for (int i = 0; i < containerx.size(); i++){
         Container * container = new Container(containerx[i]);
         containerNodes.push_back(container);
     }
-    
+
     //Populate Item
     std::cout << "\nPopulate Item Node" << std::endl;
     for (int i = 0; i < itemx.size(); i++){
         Item * item = new Item(itemx[i]);
         itemNodes.push_back(item);
     }
-    
+
     // Populate Creature
     std::cout << "\nPopulate Creature Node" << std::endl;
     for (int i = 0; i < creaturex.size(); i++){
@@ -76,15 +76,15 @@ void ZorkGame::startGame()
 {
     isGameOver = false;
     showRoomDescription();
-    
+
     while(!isGameOver) {
         isOverriden = trigger_check();
-        if (isOverriden){
+        /*if (isOverriden){
             continue;
-        }
+        }*/
 
         getline(cin, userIn);
-        
+
         if (userIn == "quit"){
             break;
         }
@@ -94,7 +94,7 @@ void ZorkGame::startGame()
         if (isOverriden){
             continue;
         }
-        
+
         checkUserInput_util(); //Check to see what action needs to be performed
         userIn = ""; //Clear user input for next iteration
     }
@@ -110,50 +110,61 @@ void ZorkGame::checkUserInput_util()
 
 void ZorkGame::checkUserInput(string input)
 {
-    //check for nsew input
+    if (input != userIn){
+  		if (input.find("Add ") != string::npos && input.find("to ") != string::npos){
+  			Add(input);
+  		}else if (input.find("Delete ") != string::npos){
+  			Delete(input);
+  		}else if (input.find("Update ") != string::npos && input.find("to ") != string::npos){
+  			Update(input);
+  		}else if (input == "Game Over"){
+  			gameOver();
+  		}
+  	}
+    //check for new input
     if(input == "n" || input == "s" || input == "e" || input == "w") {
         change_room(input);
     }
-    
+
     //display inventory
     else if(input == "i") {
         show_inventory();
     }
-    
+
     //take item from room
     else if(input.find("take ") != string::npos) {
         string command = input.substr(5);
         take(command);
     }
-    
+
     //Check for open or open exit input
     else if (input.find("open ") != string::npos){
         string ctnr = input.substr(5);
         open(ctnr);
     }
-    
+
     //check if the input is read
     else if (input.find("read ") != string::npos){
         string itemToRead = input.substr(5);
         read(itemToRead);
     }
-    
+
     //check if dropping an item
     else if (input.find("drop ") != string::npos){
         string itemToDrop = input.substr(5);
         drop(itemToDrop);
     }
-    
-    
+
+
     //check if putting an item
     else if (input.find("put ") != string::npos && input.find("in ") != string::npos){
         int found = input.find("in ");
         string command = input.substr(4, found-5);
         string command2 = input.substr(found+3);
-        
+
         put(command, command2);
     }
-    
+
     else if (input.find("turn on") != string::npos){
         //1. Find item in string
         int found = input.find("on ");
@@ -161,7 +172,7 @@ void ZorkGame::checkUserInput(string input)
         //2. Call turnon
         turnon(item);
     }
-    
+
     else if (input.find("attack") != string::npos){
         //1. Find creature in string
         int found = input.find("with ");
@@ -173,7 +184,9 @@ void ZorkGame::checkUserInput(string input)
     }
 
     else {
-        cout << "Error" << endl;
+        if (userIn == input) {
+          cout << "Error" << endl;
+        }
     }
 }
 
@@ -207,7 +220,7 @@ void ZorkGame::put(string putItem, string inContainer){
             return;
         }
     }
-    
+
     cout << "There is no such item to put" << endl;
     return;
 }
@@ -221,7 +234,7 @@ void ZorkGame::drop(string dropItem){
             return;
         }
     }
-    
+
     cout << "There is no such item to drop" << endl;
     return;
 }
@@ -237,7 +250,7 @@ void ZorkGame::read(string readItem){
             }
         }
     }
-    
+
     cout << "There is no such item to read" << endl;
     return;
 }
@@ -248,7 +261,7 @@ void ZorkGame::open(string ctnr)
         gameOver();
         return;
     }
-    
+
     for (int i = 0; i < curr_room->container_arr.size(); i++){
         if (curr_room->container_arr[i] == ctnr){
             for (unsigned int j = 0; j < containerNodes.size(); j++){
@@ -263,9 +276,9 @@ void ZorkGame::open(string ctnr)
                         cout << " to open it" << endl;
                         return;
                     }
-                    
+
                     containerNodes[j]->status = "unlocked";
-                    
+
                     if (containerNodes[j]->item_list.size() == 0){
                         cout << ctnr << " is empty" << endl;
                         return;
@@ -285,9 +298,9 @@ void ZorkGame::open(string ctnr)
             }
         }
     }
-    
+
     cout << "There is no such container in the room! " << endl;
-    
+
 }
 
 void ZorkGame::take(string itemToTake)
@@ -300,7 +313,7 @@ void ZorkGame::take(string itemToTake)
             return;
         }
     }
-    
+
     cout << "There is no such item to take! " << endl;
 }
 
@@ -323,13 +336,13 @@ void ZorkGame::show_inventory()
     if(inventory.size() == 0) {
         cout << "Inventory: empty" << endl;
     }
-    
+
     else {
         cout << "Inventory: ";
         for (int i = 0; i < inventory.size()-1; i++) {
             cout << inventory[i] + ", ";
         }
-        
+
         cout << inventory[inventory.size()-1];
         cout << endl;
     }
@@ -338,7 +351,7 @@ void ZorkGame::show_inventory()
 void ZorkGame::change_room(string d)
 {
     Room * nextRoom = curr_room;
-    
+
     for (int i = 0; i < curr_room->border_arr.size(); i++){
         if (curr_room->border_arr[i]->direction == d){
             for (int j = 0; j < roomNodes.size(); j++){
@@ -357,7 +370,7 @@ void ZorkGame::change_room(string d)
         cout << "move to room " + curr_room->name << endl;
         showRoomDescription();
     }
-    
+
     // showRoomDescription();
 }
 
@@ -365,7 +378,7 @@ void ZorkGame::change_room(string d)
 void ZorkGame::showRoomDescription()
 {
     cout << curr_room -> description << endl;
-    
+
     //Display items
     if (curr_room->item_arr.size() != 0){
         cout << "Items in this room: ";
@@ -375,7 +388,7 @@ void ZorkGame::showRoomDescription()
         cout << curr_room->item_arr.back();
         cout << endl;
     }
-    
+
     //Display containers
     if (curr_room->container_arr.size() != 0){
         cout << "Containers in this room: ";
@@ -385,7 +398,7 @@ void ZorkGame::showRoomDescription()
         cout << curr_room->container_arr.back();
         cout << endl;
     }
-    
+
     //Display creatures
     if (curr_room->creature_arr.size() != 0){
         cout << "Creatures in this room: ";
@@ -395,7 +408,7 @@ void ZorkGame::showRoomDescription()
         cout << curr_room->creature_arr.back();
         cout << endl;
     }
-    
+
     //Display borders
     if (curr_room->border_arr.size() != 0){
         cout << "You may go ";
@@ -621,23 +634,22 @@ ZorkGame::~ZorkGame() {
 }
 
 bool ZorkGame::trigger_check(){
-
-    for (int i = 0; i < itemNodes.size(); i++){
-        for (int j = 0; j < itemNodes[i]->trigger_list.size(); j++){
-            if (trigger_condition_met(itemNodes[i]->trigger_list[j])){
+    /*int whichItem;
+    for (int j = 0; j < curr_room->trigger_arr.size(); j++){
+        if (trigger_condition_met(curr_room->trigger_arr[j])){
+            return true;
+        }
+    }
+    // cout << "NO ROOM TRIGGER" << endl;
+    for (int i = 0; i < curr_room->item_arr.size(); i++){ //for each item in the room
+        whichItem = whichOne(curr_room->item_arr[i], itemNodes); //find the index of the item
+        for (int j = 0; j < itemNodes[whichItem]->trigger_list.size(); j++){ //for each trigger in item
+            if (trigger_condition_met(itemNodes[whichItem]->trigger_list[j])){ //check if its condition is met
                 return true;
             }
         }
     }
     // cout << "NO ITEM TRIGGER" << endl;
-    for (int i = 0; i < roomNodes.size(); i++){
-        for (int j = 0; j < roomNodes[i]->trigger_arr.size(); j++){
-            if (trigger_condition_met(roomNodes[i]->trigger_arr[j])){
-                return true;
-            }
-        }
-    }
-    // cout << "NO ROOM TRIGGER" << endl;
     for (int i = 0; i < containerNodes.size(); i++){
         for (int j = 0; j < containerNodes[i]->trigger_list.size(); j++){
             if (trigger_condition_met(containerNodes[i]->trigger_list[j])){
@@ -653,7 +665,41 @@ bool ZorkGame::trigger_check(){
             }
         }
     }
-    // cout << "NO CREA TRIGGER" << endl;
+    // cout << "NO CREA TRIGGER" << endl;*/
+
+    for (int i = 0; i < itemNodes.size(); i++){
+       for (int j = 0; j < itemNodes[i]->trigger_list.size(); j++){
+           if (trigger_condition_met(itemNodes[i]->trigger_list[j])){
+               return true;
+           }
+       }
+   }
+    cout << "NO ITEM TRIGGER" << endl;
+   for (int i = 0; i < roomNodes.size(); i++){
+       for (int j = 0; j < roomNodes[i]->trigger_arr.size(); j++){
+           if (trigger_condition_met(roomNodes[i]->trigger_arr[j])){
+             cout << "trigger_condition_met done" << endl;
+               return true;
+           }
+       }
+   }
+    cout << "NO ROOM TRIGGER" << endl;
+   for (int i = 0; i < containerNodes.size(); i++){
+       for (int j = 0; j < containerNodes[i]->trigger_list.size(); j++){
+           if (trigger_condition_met(containerNodes[i]->trigger_list[j])){
+               return true;
+           }
+       }
+   }
+    cout << "NO CONTA TRIGGER" << endl;
+   for (int i = 0; i < creatureNodes.size(); i++){
+       for (int j = 0; j < creatureNodes[i]->trigger_list.size(); j++){
+           if (trigger_condition_met(creatureNodes[i]->trigger_list[j])){
+               return true;
+           }
+       }
+   }
+   cout << "NO CREATURE TRIGGER" << endl;
 
     return false;
 }
@@ -669,6 +715,9 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
             s = &(trigger->conditions[i]->status);
         } else if(trigger->conditions[i]->numConditions == 3) {
             o = &(trigger->conditions[i]->owner);
+            cout << "has = " << o->has << endl;
+            cout << "owner = " << o->owner << endl;
+            cout << "object = " << o->object << endl;
         }
     }
 
@@ -712,7 +761,7 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
             }
         }
         else if (o != NULL){
-            // cout << "I SHOULD BE HERE - CHECKING OWNER IN 1" << endl;
+             //cout << "I SHOULD BE HERE - CHECKING OWNER IN 1" << endl;
             if (trig_owner_met(trigger, o)){
                 is_triggered = true;
             }
@@ -724,7 +773,7 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
         return true;
     }
 
-    // cout << "for real?" << endl;
+    //cout << "for real?" << endl;
 
     return false;
 }
@@ -732,7 +781,10 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
 void ZorkGame::implement_trigger(Trigger* trigger){
 
     cout << trigger->print << endl;
+    cout << "Trigger type = " << trigger->type << endl;
+    cout << "trigger->action.size() = " << trigger->action.size() << endl;
     for (unsigned int j = 0; j < trigger->action.size(); j++){
+        cout << "trigger->action[j] = " << trigger->action[j] << endl;
         checkUserInput(trigger->action[j]);
     }
 
@@ -745,9 +797,12 @@ bool ZorkGame::trig_owner_met(Trigger* trigger, Owner * o){
     if (o){
         string owner = o->owner;
         string obj = o->object;
+        //cout << "owner met" << endl;
+        if(o->has) {cout << "owner_has" << endl;}
         if ((o->has == true && owner_has_object(owner, obj))
                 || (o->has == false && !owner_has_object(owner, obj))){
             if (trigger->type != "used"){
+              cout << "owner met true" << endl;
                 return true;
             }
         }
@@ -775,6 +830,8 @@ bool ZorkGame::owner_has_object(string owner, string obj){
     string obj_type = ztype(obj);
 
     if (owner_type == "inventory"){
+      //cout << "owner_has_object inventory" << endl;
+      //cout << "obj_type = " << obj_type <<endl;
         if (obj_type == "item"){
             for (unsigned int i = 0; i < inventory.size(); i++){
                 if (inventory[i] == obj){

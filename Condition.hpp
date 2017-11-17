@@ -24,7 +24,7 @@ public:
     Status status;
     Owner owner;
     int numConditions;
-    
+
     Condition(xml_node<>* xnode) {
         numConditions = condition_count(xnode);
         if (numConditions == 2) {
@@ -34,7 +34,7 @@ public:
         }
     }
     ~Condition();
-    
+
     void initStatus(xml_node<>* xnode) {
         for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
             if(string(curr->name()) == "object"){
@@ -45,21 +45,25 @@ public:
             }
         }
     }
-    
+
     void initOwner(xml_node<>* xnode) {
         for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
             if(string(curr->name()) == "object"){
                 this->owner.object = curr -> value();
             }
             if(string(curr->name()) == "has"){
-                this->owner.has = curr -> value();
+                if (string(curr->value()) == "yes") {
+                  this->owner.has = true;
+                } else {
+                  this->owner.has = false;
+                }
             }
             if(string(curr->name()) == "owner"){
                 this->owner.owner = curr -> value();
             }
         }
     }
-    
+
     int condition_count(xml_node<>* xnode) {
         int num = 0;
         for(xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()) {
