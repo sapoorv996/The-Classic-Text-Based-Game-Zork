@@ -79,9 +79,9 @@ void ZorkGame::startGame()
 
     while(!isGameOver) {
         isOverriden = trigger_check();
-        /*if (isOverriden){
+        if (isOverriden) {
             continue;
-        }*/
+        }
 
         getline(cin, userIn);
 
@@ -90,8 +90,8 @@ void ZorkGame::startGame()
         }
 
         isOverriden = trigger_check();
-        cout << "Overide after user in: " << isOverriden << endl;
-        if (isOverriden){
+        //cout << "Overide after user in: " << isOverriden << endl;
+        if (isOverriden) {
             continue;
         }
 
@@ -176,6 +176,11 @@ void ZorkGame::checkUserInput(string input)
     else if (input.find("attack") != string::npos){
         //1. Find creature in string
         int found = input.find("with ");
+        //check if input is valid
+        if (found == string::npos) {
+          cout << "Error" << endl;
+          return;
+        }
         string creature = input.substr(7, found - 8);
         //2. Find item in string
         string item = input.substr(found + 5);
@@ -423,7 +428,7 @@ void ZorkGame::showRoomDescription()
 void ZorkGame::turnon(string item) {
     //1. Check if item exists
     if (whatIs(item) != "Item") {
-        std::cout << "That item doesn't exist." << std::endl;
+        std::cout << "That isn't an item." << std::endl;
         return;
     }
     int i = whichOne(item, itemNodes);
@@ -445,6 +450,7 @@ void ZorkGame::turnon(string item) {
 }
 
 void ZorkGame::performAction(string action) {
+    //cout << "Performing action: " << action << endl;
     if(action.find("Add") != string::npos){
         Add(action);
         return;
@@ -454,6 +460,7 @@ void ZorkGame::performAction(string action) {
         return;
     }
     if(action.find("Update") != string::npos){
+      //cout << "Calling update..." << endl;
         Update(action);
         return;
     }
@@ -461,7 +468,6 @@ void ZorkGame::performAction(string action) {
         gameOver();
         return;
     }
-    //not sure about this...
     userIn = action;
     checkUserInput_util();
 }
@@ -583,8 +589,9 @@ void ZorkGame::Delete(string object) { //Delete references in each room should "
 void ZorkGame::Update(string action) {
     //Usage: Update (object) to (status)
     int found = action.find("to ");
-    string object = action.substr(7, found - 2);
+    string object = action.substr(7, found - 8);
     string status = action.substr(found + 3);
+    //cout << "Update: object = " << object << ", status = " << status << endl;
     int i;
     for (i = 0; i < roomNodes.size(); i++) { //for each room
         if (roomNodes[i]->name == object) {
@@ -601,12 +608,13 @@ void ZorkGame::Update(string action) {
     for (i = 0; i < itemNodes.size(); i++) { //for each item
         if (itemNodes[i]->name == object) {
             itemNodes[i]->status = status;
+            //cout << "Updated " << itemNodes[i]->name << " to " << itemNodes[i]->status << endl;
             return;
         }
     }
-    for (i = 0; i < itemNodes.size(); i++) { //for each creature
-        if (itemNodes[i]->name == object) {
-            itemNodes[i]->status = status;
+    for (i = 0; i < creatureNodes.size(); i++) { //for each creature
+        if (creatureNodes[i]->name == object) {
+            creatureNodes[i]->status = status;
             return;
         }
     }
@@ -634,14 +642,16 @@ ZorkGame::~ZorkGame() {
 }
 
 bool ZorkGame::trigger_check(){
-    /*int whichItem;
+    //for each trigger in the current room
     for (int j = 0; j < curr_room->trigger_arr.size(); j++){
         if (trigger_condition_met(curr_room->trigger_arr[j])){
             return true;
         }
     }
     // cout << "NO ROOM TRIGGER" << endl;
-    for (int i = 0; i < curr_room->item_arr.size(); i++){ //for each item in the room
+    //for each item in the room
+    int whichItem;
+    for (int i = 0; i < curr_room->item_arr.size(); i++){
         whichItem = whichOne(curr_room->item_arr[i], itemNodes); //find the index of the item
         for (int j = 0; j < itemNodes[whichItem]->trigger_list.size(); j++){ //for each trigger in item
             if (trigger_condition_met(itemNodes[whichItem]->trigger_list[j])){ //check if its condition is met
@@ -650,56 +660,38 @@ bool ZorkGame::trigger_check(){
         }
     }
     // cout << "NO ITEM TRIGGER" << endl;
-    for (int i = 0; i < containerNodes.size(); i++){
-        for (int j = 0; j < containerNodes[i]->trigger_list.size(); j++){
-            if (trigger_condition_met(containerNodes[i]->trigger_list[j])){
+    //for each container in the room
+    int whichContainer;
+    for (int i = 0; i < curr_room->container_arr.size(); i++) {
+        // cout << "Current Room: " << curr_room->name << endl;
+        // cout << "Creature: " << curr_room->creature_arr[i] << endl;
+        whichContainer = whichOne(curr_room->container_arr[i], containerNodes); //find the index of the creature
+        // cout << "Creature index: " << whichCreature;
+        // cout << ", Number of triggers: " << creatureNodes[whichCreature]->trigger_list.size() << endl;
+        for (int j = 0; j < containerNodes[whichContainer]->trigger_list.size(); j++){
+            if (trigger_condition_met(containerNodes[whichContainer]->trigger_list[j])){
+              //cout << "trigger_condition_met for creature" << endl;
                 return true;
             }
         }
     }
     // cout << "NO CONTA TRIGGER" << endl;
-    for (int i = 0; i < creatureNodes.size(); i++){
-        for (int j = 0; j < creatureNodes[i]->trigger_list.size(); j++){
-            if (trigger_condition_met(creatureNodes[i]->trigger_list[j])){
+    //for each creature in the room
+    int whichCreature;
+    for (int i = 0; i < curr_room->creature_arr.size(); i++) {
+        // cout << "Current Room: " << curr_room->name << endl;
+        // cout << "Creature: " << curr_room->creature_arr[i] << endl;
+        whichCreature = whichOne(curr_room->creature_arr[i], creatureNodes); //find the index of the creature
+        // cout << "Creature index: " << whichCreature;
+        // cout << ", Number of triggers: " << creatureNodes[whichCreature]->trigger_list.size() << endl;
+        for (int j = 0; j < creatureNodes[whichCreature]->trigger_list.size(); j++){
+            if (trigger_condition_met(creatureNodes[whichCreature]->trigger_list[j])){
+              //cout << "trigger_condition_met for creature" << endl;
                 return true;
             }
         }
     }
-    // cout << "NO CREA TRIGGER" << endl;*/
-
-    for (int i = 0; i < itemNodes.size(); i++){
-       for (int j = 0; j < itemNodes[i]->trigger_list.size(); j++){
-           if (trigger_condition_met(itemNodes[i]->trigger_list[j])){
-               return true;
-           }
-       }
-   }
-    cout << "NO ITEM TRIGGER" << endl;
-   for (int i = 0; i < roomNodes.size(); i++){
-       for (int j = 0; j < roomNodes[i]->trigger_arr.size(); j++){
-           if (trigger_condition_met(roomNodes[i]->trigger_arr[j])){
-             cout << "trigger_condition_met done" << endl;
-               return true;
-           }
-       }
-   }
-    cout << "NO ROOM TRIGGER" << endl;
-   for (int i = 0; i < containerNodes.size(); i++){
-       for (int j = 0; j < containerNodes[i]->trigger_list.size(); j++){
-           if (trigger_condition_met(containerNodes[i]->trigger_list[j])){
-               return true;
-           }
-       }
-   }
-    cout << "NO CONTA TRIGGER" << endl;
-   for (int i = 0; i < creatureNodes.size(); i++){
-       for (int j = 0; j < creatureNodes[i]->trigger_list.size(); j++){
-           if (trigger_condition_met(creatureNodes[i]->trigger_list[j])){
-               return true;
-           }
-       }
-   }
-   cout << "NO CREATURE TRIGGER" << endl;
+    // cout << "NO CREA TRIGGER" << endl;
 
     return false;
 }
@@ -715,9 +707,9 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
             s = &(trigger->conditions[i]->status);
         } else if(trigger->conditions[i]->numConditions == 3) {
             o = &(trigger->conditions[i]->owner);
-            cout << "has = " << o->has << endl;
-            cout << "owner = " << o->owner << endl;
-            cout << "object = " << o->object << endl;
+            // cout << "has = " << o->has << endl;
+            // cout << "owner = " << o->owner << endl;
+            // cout << "object = " << o->object << endl;
         }
     }
 
@@ -781,15 +773,18 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
 void ZorkGame::implement_trigger(Trigger* trigger){
 
     cout << trigger->print << endl;
-    cout << "Trigger type = " << trigger->type << endl;
-    cout << "trigger->action.size() = " << trigger->action.size() << endl;
+    // cout << "Trigger type = " << trigger->type << endl;
+    // cout << "trigger->action.size() = " << trigger->action.size() << endl;
     for (unsigned int j = 0; j < trigger->action.size(); j++){
         cout << "trigger->action[j] = " << trigger->action[j] << endl;
         checkUserInput(trigger->action[j]);
     }
 
-    if (trigger->type == "single"){
+    if (trigger->type == "single") {
         trigger->type = "used";
+    }
+    if (trigger->type == "permanent") {
+        trigger->type = "permanent - used";
     }
 }
 
@@ -798,12 +793,14 @@ bool ZorkGame::trig_owner_met(Trigger* trigger, Owner * o){
         string owner = o->owner;
         string obj = o->object;
         //cout << "owner met" << endl;
-        if(o->has) {cout << "owner_has" << endl;}
         if ((o->has == true && owner_has_object(owner, obj))
                 || (o->has == false && !owner_has_object(owner, obj))){
-            if (trigger->type != "used"){
-              cout << "owner met true" << endl;
+            if (trigger->type != "used" && trigger->type != "permanent - used") {
+              //cout << "owner met true" << endl;
                 return true;
+            }
+            if (trigger->type == "permanent - used") {
+              trigger->type = "permanent";
             }
         }
     }
@@ -816,9 +813,12 @@ bool ZorkGame::trig_status_met(Trigger* trigger, Status * s){
         string status = s->status;
         string obj = s->object;
         if (object_meet_status(obj, status)){
-            if (trigger->type != "used"){
-                return true;
-            }
+          if (trigger->type != "used" && trigger->type != "permanent - used") {
+              return true;
+          }
+          if (trigger->type == "permanent - used") {
+            trigger->type = "permanent";
+          }
         }
     }
 

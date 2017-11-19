@@ -25,9 +25,12 @@ public:
     ~Trigger();
 
     void setupNode(xml_node<>* xnode) {
-    	bool has_command = false;
-		bool has_print = false;
-		bool has_action = false;
+    	has_command = false;
+		has_print = false;
+		has_action = false;
+    command = "";
+    type = "";
+
 
     	for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
 			if (string(curr->name()) == "type") {
@@ -47,7 +50,7 @@ public:
 			}
 		}
     }
-    
+
     vector<Condition*> conditions;
     string type;
     string command;
