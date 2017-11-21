@@ -428,18 +428,18 @@ void ZorkGame::showRoomDescription()
 void ZorkGame::turnon(string item) {
     //1. Check if item exists
     if (whatIs(item) != "Item") {
-        std::cout << "That isn't an item." << std::endl;
+        std::cout << "Error" << std::endl;
         return;
     }
     int i = whichOne(item, itemNodes);
     //2. Check if the item is in the inventory
     if (std::find(inventory.begin(), inventory.end(), item) == inventory.end()) {
-        std::cout << "That item is not in your inventory." << std::endl;
+        std::cout << "Error" << std::endl;
         return;
     }
     //3. Check if item can be turned on
     if (!(itemNodes[i]->turnon.has)) {
-        std::cout << "That item can't be turned on." << std::endl;
+        std::cout << "Error" << std::endl;
         return;
     }
     //4. Turn on item
@@ -479,7 +479,7 @@ void ZorkGame::attack(string creature, string item) {
         if (curr_room->creature_arr[i] == creature) {break;}
     }
     if (curr_room->creature_arr[i] != creature) {
-    std:cout << "That creature isn't in the room." << std::endl;
+    std:cout << "Error" << std::endl;
         return;
     }
     //2. Check if the item is in your inventory
@@ -487,7 +487,7 @@ void ZorkGame::attack(string creature, string item) {
         if (inventory[i] == item) {break;}
     }
     if (inventory[i] != item) {
-        std::cout << item << "That item is not in your inventory." << std::endl;
+        std::cout << item << "Error" << std::endl;
         return;
     }
     //3. Start the attack
@@ -666,11 +666,12 @@ bool ZorkGame::trigger_check(){
         // cout << "Current Room: " << curr_room->name << endl;
         // cout << "Creature: " << curr_room->creature_arr[i] << endl;
         whichContainer = whichOne(curr_room->container_arr[i], containerNodes); //find the index of the creature
-        // cout << "Creature index: " << whichCreature;
-        // cout << ", Number of triggers: " << creatureNodes[whichCreature]->trigger_list.size() << endl;
+        //cout << "Container index: " << whichContainer;
+        //cout << ", Number of triggers: " << containerNodes[whichContainer]->trigger_list.size() << endl;
         for (int j = 0; j < containerNodes[whichContainer]->trigger_list.size(); j++){
+          //cout << "trigger_condition_met called for container" << endl;
             if (trigger_condition_met(containerNodes[whichContainer]->trigger_list[j])){
-              //cout << "trigger_condition_met for creature" << endl;
+              //cout << "trigger_condition_met for container" << endl;
                 return true;
             }
         }
@@ -716,7 +717,7 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
     // cout << "THE TRIGGER COMMAND IS: " << trigger->command << endl;
 
     if (trigger->command == ""){
-        // cout << "i have no command" << trigger->command << endl;
+        //cout << "i have no command" << trigger->command << endl;
         if (o && s){
             if (trig_owner_met(trigger, o) && trig_status_met(trigger, s)){
                 is_triggered = true;
@@ -728,6 +729,7 @@ bool ZorkGame::trigger_condition_met(Trigger* trigger){
             }
         }
         else if (o){
+          //cout << "trig_owner_met called" << endl;
             if (trig_owner_met(trigger, o)){
                 is_triggered = true;
             }
@@ -776,11 +778,11 @@ void ZorkGame::implement_trigger(Trigger* trigger){
     // cout << "Trigger type = " << trigger->type << endl;
     // cout << "trigger->action.size() = " << trigger->action.size() << endl;
     for (unsigned int j = 0; j < trigger->action.size(); j++){
-        cout << "trigger->action[j] = " << trigger->action[j] << endl;
+        //cout << "trigger->action[j] = " << trigger->action[j] << endl;
         checkUserInput(trigger->action[j]);
     }
 
-    if (trigger->type == "single") {
+    if (trigger->type == "single" || trigger->type == "") {
         trigger->type = "used";
     }
     if (trigger->type == "permanent") {
@@ -792,7 +794,7 @@ bool ZorkGame::trig_owner_met(Trigger* trigger, Owner * o){
     if (o){
         string owner = o->owner;
         string obj = o->object;
-        //cout << "owner met" << endl;
+        //cout << "owner_has_object = " << owner_has_object(owner, obj) << endl;
         if ((o->has == true && owner_has_object(owner, obj))
                 || (o->has == false && !owner_has_object(owner, obj))){
             if (trigger->type != "used" && trigger->type != "permanent - used") {
@@ -828,6 +830,10 @@ bool ZorkGame::trig_status_met(Trigger* trigger, Status * s){
 bool ZorkGame::owner_has_object(string owner, string obj){
     string owner_type = ztype(owner);
     string obj_type = ztype(obj);
+    // cout << "owner is " << owner << endl;
+    // cout << "obj is " << obj << endl;
+    // cout << "owner_type is " << owner_type << endl;
+    // cout << "obj_type is " << obj_type << endl;
 
     if (owner_type == "inventory"){
       //cout << "owner_has_object inventory" << endl;
@@ -860,10 +866,12 @@ bool ZorkGame::owner_has_object(string owner, string obj){
             }
         }
     }else if (owner_type == "container"){
-        if (obj_type == "item"){
-            for (unsigned int i = 0; i < roomNodes.size(); i++){
-                if (roomNodes[i]->name == owner){
-                    return roomNodes[i]->has_item(obj);
+        if (obj_type == "item") {
+            for (unsigned int i = 0; i < containerNodes.size(); i++){
+              //cout << "roomNodes[" << i << "]->name = " << containerNodes[i]->name << endl;
+                if (containerNodes[i]->name == owner){
+                    //cout << "roomNodes[i]->name = " << containerNodes[i]->name << endl;
+                    return containerNodes[i]->has_item(obj);
                 }
             }
         }
