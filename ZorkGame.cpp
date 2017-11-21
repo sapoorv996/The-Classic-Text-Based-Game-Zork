@@ -474,13 +474,18 @@ void ZorkGame::performAction(string action) {
 
 void ZorkGame::attack(string creature, string item) {
     int i;
+    //cout << "attack called" << endl;
     //1. Check if the creature is in the room
     for (i = 0; i < curr_room->creature_arr.size(); i++) {
         if (curr_room->creature_arr[i] == creature) {break;}
     }
+    if(i == curr_room->creature_arr.size()) {
+      cout << "Error" << endl;
+      return;
+    }
     if (curr_room->creature_arr[i] != creature) {
-    std:cout << "Error" << std::endl;
-        return;
+      std:cout << "Error" << std::endl;
+      return;
     }
     //2. Check if the item is in your inventory
     for (i = 0; i < inventory.size(); i++) {
@@ -494,10 +499,14 @@ void ZorkGame::attack(string creature, string item) {
     std::cout << "You assault the " << creature << " with the " << item << "." << std::endl;
     //4. Check if creature is vulnerable to item
     int whichCreature = whichOne(creature, creatureNodes);
+    if (whichCreature == -1) {
+      cout << "Error" << std::endl;
+      return;
+    }
     for (i = 0; i < creatureNodes[whichCreature]->vulnerability.size(); i++) { //for each vulnerability
         if (creatureNodes[whichCreature]->vulnerability[i] == item) {break;}
     }
-    if (creatureNodes[whichCreature]->vulnerability[i] != item) {
+    if (i == creatureNodes[whichCreature]->vulnerability.size()) {
         std::cout << "It's not very effective." << std::endl;
         return;
     }
