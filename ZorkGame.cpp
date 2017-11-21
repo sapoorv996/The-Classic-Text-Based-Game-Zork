@@ -432,6 +432,10 @@ void ZorkGame::turnon(string item) {
         return;
     }
     int i = whichOne(item, itemNodes);
+    if (i == -1) {
+      std::cout << "Error" << std::endl;
+      return;
+    }
     //2. Check if the item is in the inventory
     if (std::find(inventory.begin(), inventory.end(), item) == inventory.end()) {
         std::cout << "Error" << std::endl;
