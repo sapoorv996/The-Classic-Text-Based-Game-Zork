@@ -795,7 +795,7 @@ void ZorkGame::implement_trigger(Trigger* trigger){
         checkUserInput(trigger->action[j]);
     }
 
-    if (trigger->type == "single" || trigger->type == "") {
+    if (trigger->type == "single") {
         trigger->type = "used";
     }
     if (trigger->type == "permanent") {

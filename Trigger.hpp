@@ -29,7 +29,7 @@ public:
 		has_print = false;
 		has_action = false;
     command = "";
-    type = "";
+    type = "single"; //default value is single
 
 
     	for (xml_node<> * curr = xnode->first_node(); curr; curr = curr->next_sibling()){
